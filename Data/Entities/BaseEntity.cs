@@ -1,4 +1,4 @@
-﻿namespace Server.Data.Entities;
+﻿namespace Data.Entities;
 
 public class BaseEntity
 {

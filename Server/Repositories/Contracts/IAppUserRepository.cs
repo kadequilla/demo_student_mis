@@ -2,6 +2,6 @@
 
 namespace Server.Repositories.Contracts;
 
-public interface IStudentRepository : IBaseRepository<Student>
+public interface IAppUserRepository : IBaseRepository<AppUser>
 {
 }

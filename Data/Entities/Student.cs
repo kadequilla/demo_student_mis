@@ -1,4 +1,4 @@
-﻿using Server.Data.Entities;
+﻿using Data.Entities;
 
 namespace Data.Entities;
 

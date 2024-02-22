@@ -1,103 +1,22 @@
 using Data.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Server.Data;
+using Server.Repositories.Contracts;
+using Server.Responses;
 
 namespace Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AppUserController : ControllerBase
+    public class AppUserController(IAppUserRepository appUserRepository) : AbstractControllerBase<AppUser>
     {
-        private readonly ApplicationDbContext _context;
-
-        public AppUserController(ApplicationDbContext context)
+        public override ActionResult<GeneralResponse> GetAll()
         {
-            _context = context;
+            return Ok(appUserRepository.GetAll());
         }
 
-        // GET: api/AppUser
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetAppUsers()
-        {
-            return await _context.AppUsers.ToListAsync();
-        }
-
-        // GET: api/AppUser/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AppUser>> GetAppUser(int id)
-        {
-            var appUser = await _context.AppUsers.FindAsync(id);
-
-            if (appUser == null)
-            {
-                return NotFound();
-            }
-
-            return appUser;
-        }
-
-        // PUT: api/AppUser/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAppUser(int id, AppUser appUser)
-        {
-            if (id != appUser.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(appUser).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AppUserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/AppUser
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<AppUser>> PostAppUser(AppUser appUser)
-        {
-            _context.AppUsers.Add(appUser);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetAppUser", new { id = appUser.Id }, appUser);
-        }
-
-        // DELETE: api/AppUser/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAppUser(int id)
-        {
-            var appUser = await _context.AppUsers.FindAsync(id);
-            if (appUser == null)
-            {
-                return NotFound();
-            }
-
-            _context.AppUsers.Remove(appUser);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool AppUserExists(int id)
-        {
-            return _context.AppUsers.Any(e => e.Id == id);
-        }
+        public override Task<GeneralResponse> GetById(int id) => appUserRepository.GetById(id)!;
+        public override Task<GeneralResponse> Post(AppUser obj) => appUserRepository.Post(obj);
+        public override Task<GeneralResponse> Put(AppUser obj) => appUserRepository.Put(obj);
+        public override Task<GeneralResponse> Delete(int id) => appUserRepository.Delete(id);
     }
 }

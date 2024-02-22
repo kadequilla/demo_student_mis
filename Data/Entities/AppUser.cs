@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Server.Data.Entities;
+using Data.Entities;
 
 namespace Data.Entities;
 
@@ -7,6 +7,6 @@ public class AppUser : BaseEntity
 {
     public int Id { get; set; }
     public string? FullName { get; set; }
-    public string? Email { get; set; }
-    public string Password { get; set; }
+    [Required] [EmailAddress] public string Email { get; set; }
+    [Required] public string Password { get; set; }
 }

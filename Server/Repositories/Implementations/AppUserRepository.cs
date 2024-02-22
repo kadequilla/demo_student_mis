@@ -6,29 +6,30 @@ using Server.Responses;
 
 namespace Server.Repositories.Implementations;
 
-public class StudentRepository(ApplicationDbContext context) : IStudentRepository
+public class AppUserRepository(ApplicationDbContext context) : IAppUserRepository
 {
     public GeneralResponse GetAll()
     {
-        return new GeneralResponse(true, context.Students.ToList());
+        return new GeneralResponse(true, context.AppUsers.ToList());
     }
 
     public async Task<GeneralResponse?> GetById(int id)
     {
-        var student = await context.Students.FindAsync(id);
-        return student is null ? new GeneralResponse(false, "Not found!") : new GeneralResponse(true, student);
+        var appUser = await context.AppUsers.FindAsync(id);
+        return appUser is null ? new GeneralResponse(false, "Not found!") : new GeneralResponse(true, appUser);
     }
 
-    public async Task<GeneralResponse> Post(Student student)
+    public async Task<GeneralResponse> Post(AppUser appUser)
     {
         try
         {
-            student.DateCreated = DateTime.Now;
-            student.IsActive = true;
-            context.Students.Add(student);
+            appUser.Password = BCrypt.Net.BCrypt.HashPassword(appUser.Password);
+            appUser.DateCreated = DateTime.Now;
+            appUser.IsActive = true;
+            context.AppUsers.Add(appUser);
 
             await context.SaveChangesAsync();
-            return new GeneralResponse(true, student);
+            return new GeneralResponse(true, appUser);
         }
         catch (Exception e)
         {
@@ -36,13 +37,13 @@ public class StudentRepository(ApplicationDbContext context) : IStudentRepositor
         }
     }
 
-    public async Task<GeneralResponse> Put(Student? obj)
+    public async Task<GeneralResponse> Put(AppUser? obj)
     {
         if (obj is null) return new GeneralResponse(false, "Student not found!");
-        if (!StudentExists(obj.Id)) return new GeneralResponse(false, "Student not found!");
+        if (!AppUserExists(obj.Id)) return new GeneralResponse(false, "User not found!");
+
 
         context.Entry(obj).State = EntityState.Modified;
-
         try
         {
             await context.SaveChangesAsync();
@@ -56,10 +57,10 @@ public class StudentRepository(ApplicationDbContext context) : IStudentRepositor
 
     public async Task<GeneralResponse> Delete(int id)
     {
-        var student = await context.Students.FindAsync(id);
-        if (student is null) return new GeneralResponse(false, "Student not found!");
+        var appUser = await context.AppUsers.FindAsync(id);
+        if (appUser is null) return new GeneralResponse(false, "User not found!");
 
-        context.Students.Remove(student);
+        context.AppUsers.Remove(appUser);
         try
         {
             await context.SaveChangesAsync();
@@ -71,8 +72,8 @@ public class StudentRepository(ApplicationDbContext context) : IStudentRepositor
         }
     }
 
-    private bool StudentExists(int id)
+    private bool AppUserExists(int id)
     {
-        return context.Students.Any(e => e.Id == id);
+        return context.AppUsers.Any(e => e.Id == id);
     }
 }
